@@ -2,8 +2,8 @@ function Contact() {
   return (
     <section>
       <h2>Contact</h2>
-      <p>Email: me@example.com</p>
-      <p>LinkedIn: linkedin.com/in/myprofile</p>
+      <p>Email: gayanirajapaksha6@gmail.com</p>
+      <p>LinkedIn: www.linkedin.com/in/gayanirajapaksha</p>
     </section>
   );
 }
