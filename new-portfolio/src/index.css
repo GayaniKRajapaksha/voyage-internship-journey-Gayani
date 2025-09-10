@@ -1,0 +1,20 @@
+:root{
+  --bg: #f8f9fa;
+  --text: #111;
+  --accent: #0b74de;
+}
+
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:system-ui,Segoe UI,Roboto,Arial; background:var(--bg); color:var(--text); padding:1rem}
+.app-container{max-width:900px;margin:1.6rem auto;padding:1rem;background:#fff;border-radius:8px;box-shadow:0 6px 18px rgba(0,0,0,0.06)}
+
+.nav{background:#fff; border-bottom:1px solid rgba(0,0,0,0.06); position:sticky; top:0; z-index:50}
+.nav-inner{max-width:900px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:.6rem 1rem}
+.brand{font-weight:700}
+.nav-list{list-style:none;display:flex;gap:0.5rem}
+.nav-link{display:inline-block;padding:.4rem .7rem;border-radius:6px;text-decoration:none;color:var(--text)}
+.nav-link.active{background:var(--accent);color:#fff}
+section{padding:1rem 0}
+ul{margin-top:0.5rem}
+li{margin-bottom:0.8rem}
+button{padding:.45rem .8rem;border-radius:6px;border:1px solid rgba(0,0,0,0.08);cursor:pointer}
