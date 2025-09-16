@@ -1,0 +1,27 @@
+{
+  "openapi": "3.0.0",
+  "info": { "title": "Books API", "version": "1.0.0" },
+  "paths": {
+    "/api/books": {
+      "get": { "summary": "List books", "responses": { "200": { "description": "OK" } } },
+      "post": { "summary": "Create book", "requestBody": { "content": { "application/json": { "schema": { "$ref": "#/components/schemas/BookInput" } } } }, "responses": { "201": { "description": "Created" } } }
+    },
+    "/api/books/{id}": {
+      "get": { "parameters":[{"name":"id","in":"path","required":true,"schema":{"type":"string"}}], "responses": {"200":{"description":"OK"}, "404":{ "description":"Not Found"}}}
+    }
+  },
+  "components": {
+    "schemas": {
+      "BookInput": {
+        "type":"object",
+        "properties":{
+          "title":{"type":"string"},
+          "author":{"type":"string"},
+          "publishedDate":{"type":"string","format":"date"},
+          "pages":{"type":"integer"}
+        },
+        "required":["title","author"]
+      }
+    }
+  }
+}
