@@ -1,0 +1,9 @@
+{
+  "products": [
+    { "id": 1, "name": "T-Shirt", "price": 25, "image": "/images/tshirt.jpg" },
+    { "id": 2, "name": "Jeans", "price": 60, "image": "/images/jeans.jpg" },
+    { "id": 3, "name": "Shoes", "price": 80, "image": "/images/shoes.jpg" },
+    { "id": 4, "name": "Hat", "price": 15, "image": "/images/hat.jpg" },
+    { "id": 5, "name": "Sunglasses", "price": 40, "image": "/images/sunglasses.jpg" }
+  ]
+}
