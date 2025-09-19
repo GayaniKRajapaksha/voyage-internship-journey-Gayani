@@ -1,61 +1,99 @@
-const Book = require('../models/Book');
 const mongoose = require('mongoose');
+const Book = require('../models/Book');
 
-exports.createBook = async (req, res, next) => {
+// Get all books
+exports.getBooks = async (req, res) => {
   try {
-    const book = new Book(req.body);
-    await book.save();
-    res.status(201)
-       .location(`/api/books/${book._id}`)
-       .json(book);
-  } catch (err) { next(err); }
+    const books = await Book.find();
+    res.json(books);
+  } catch (err) {
+    console.error('Error fetching books:', err.message);
+    res.status(500).json({ message: 'Server error while fetching books' });
+  }
 };
 
-exports.getBooks = async (req, res, next) => {
-  try {
-    const { page = 1, limit = 10, author, title, genre, available, sort = '-createdAt' } = req.query;
-    const q = {};
-    if (author) q.author = new RegExp(author, 'i');
-    if (title)  q.title  = new RegExp(title, 'i');
-    if (genre)  q.genres = genre;
-    if (available !== undefined) q.available = available === 'true';
-
-    const skip = (page - 1) * limit;
-    const [total, data] = await Promise.all([
-      Book.countDocuments(q),
-      Book.find(q).sort(sort).skip(parseInt(skip)).limit(parseInt(limit))
-    ]);
-
-    res.json({ meta: { page: parseInt(page), limit: parseInt(limit), total }, data });
-  } catch (err) { next(err); }
-};
-
-exports.getBookById = async (req, res, next) => {
+// Get book by ID
+exports.getBookById = async (req, res) => {
   try {
     const { id } = req.params;
-    if (!mongoose.isValidObjectId(id)) return res.status(400).json({ message: 'Invalid id' });
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(400).json({ message: 'Invalid book ID' });
+
     const book = await Book.findById(id);
-    if (!book) return res.status(404).json({ message: 'Not found' });
+    if (!book) return res.status(404).json({ message: 'Book not found' });
+
     res.json(book);
-  } catch (err) { next(err); }
+  } catch (err) {
+    console.error('Error fetching book:', err.message);
+    res.status(500).json({ message: 'Server error while fetching book' });
+  }
 };
 
-exports.updateBook = async (req, res, next) => {
+// Create a book
+exports.createBook = async (req, res) => {
   try {
-    const { id } = req.params;
-    if (!mongoose.isValidObjectId(id)) return res.status(400).json({ message: 'Invalid id' });
-    const book = await Book.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
-    if (!book) return res.status(404).json({ message: 'Not found' });
-    res.json(book);
-  } catch (err) { next(err); }
+    const { title, author, publishedYear, isbn, price } = req.body;
+
+    // Basic validation
+    if (!title || !author) {
+      return res.status(400).json({ message: 'Title and author are required' });
+    }
+
+    // Check for duplicate ISBN if provided
+    if (isbn) {
+      const existing = await Book.findOne({ isbn });
+      if (existing) return res.status(400).json({ message: 'ISBN already exists' });
+    }
+
+    const book = new Book({ title, author, publishedYear, isbn, price });
+    const savedBook = await book.save();
+    res.status(201).json(savedBook);
+
+  } catch (err) {
+    console.error('Error creating book:', err.message);
+    // Handle Mongoose validation errors
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
+    res.status(500).json({ message: 'Server error while creating book' });
+  }
 };
 
-exports.deleteBook = async (req, res, next) => {
+// Update book
+exports.updateBook = async (req, res) => {
   try {
     const { id } = req.params;
-    if (!mongoose.isValidObjectId(id)) return res.status(400).json({ message: 'Invalid id' });
-    const book = await Book.findByIdAndDelete(id);
-    if (!book) return res.status(404).json({ message: 'Not found' });
-    res.status(204).send();
-  } catch (err) { next(err); }
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(400).json({ message: 'Invalid book ID' });
+
+    const updatedBook = await Book.findByIdAndUpdate(id, req.body, { new: true, runValidators: true });
+    if (!updatedBook) return res.status(404).json({ message: 'Book not found' });
+
+    res.json(updatedBook);
+  } catch (err) {
+    console.error('Error updating book:', err.message);
+    if (err.name === 'ValidationError') {
+      const messages = Object.values(err.errors).map(e => e.message);
+      return res.status(400).json({ message: messages.join(', ') });
+    }
+    res.status(500).json({ message: 'Server error while updating book' });
+  }
+};
+
+// Delete book
+exports.deleteBook = async (req, res) => {
+  try {
+    const { id } = req.params;
+    if (!mongoose.Types.ObjectId.isValid(id))
+      return res.status(400).json({ message: 'Invalid book ID' });
+
+    const deletedBook = await Book.findByIdAndDelete(id);
+    if (!deletedBook) return res.status(404).json({ message: 'Book not found' });
+
+    res.json({ message: 'Book deleted successfully' });
+  } catch (err) {
+    console.error('Error deleting book:', err.message);
+    res.status(500).json({ message: 'Server error while deleting book' });
+  }
 };

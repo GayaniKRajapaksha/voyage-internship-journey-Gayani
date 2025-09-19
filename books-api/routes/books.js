@@ -1,13 +1,11 @@
 const express = require('express');
 const router = express.Router();
-const ctrl = require('../controllers/booksController');
-const { bookValidationRules, validate } = require('../middleware/validators');
+const controller = require('../controllers/booksController');
 
-router.get('/', ctrl.getBooks);
-router.post('/', bookValidationRules, validate, ctrl.createBook);
-router.get('/:id', ctrl.getBookById);
-router.put('/:id', bookValidationRules, validate, ctrl.updateBook);
-router.patch('/:id', ctrl.updateBook); // optional: allow partial updates with validation tuned for patch
-router.delete('/:id', ctrl.deleteBook);
+router.post('/', controller.createBook);
+router.get('/', controller.getBooks);
+router.get('/:id', controller.getBookById);
+router.put('/:id', controller.updateBook);
+router.delete('/:id', controller.deleteBook);
 
 module.exports = router;
