@@ -1,0 +1,16 @@
+[
+  {
+    "id": 1,
+    "title": "The Pragmatic Programmer",
+    "author": "Andrew Hunt",
+    "year": 1999,
+    "description": "Great engineering practices."
+  },
+  {
+    "id": 2,
+    "title": "You Don't Know JS",
+    "author": "Kyle Simpson",
+    "year": 2015,
+    "description": "Deep dive into JavaScript."
+  }
+]
