@@ -1,17 +1,3 @@
-// import axios from "axios";
-
-// const api = axios.create({
-//   baseURL: "http://localhost:5000/api/books", // your backend API
-// });
-
-// export const getBooks = () => api.get("/");
-// export const getBook = (id) => api.get(`/${id}`);
-// export const addBook = (data) => api.post("/", data);
-// export const updateBook = (id, data) => api.put(`/${id}`, data);
-// export const deleteBook = (id) => api.delete(`/${id}`);
-
-
-
 // Fake in-memory data store
 let books = [
   { id: 1, title: "The Hobbit", author: "J.R.R. Tolkien", price: 10 },
@@ -22,10 +8,9 @@ let books = [
 const delay = (ms) => new Promise((res) => setTimeout(res, ms));
 
 export const getBooks = async () => {
-  await delay(300); // fake loading
+  await delay(300);
   return { data: books };
 };
-
 
 export const getBook = async (id) => {
   await delay(300);

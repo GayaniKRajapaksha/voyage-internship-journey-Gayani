@@ -1,31 +1,76 @@
-import { useForm } from "react-hook-form";
-import { yupResolver } from "@hookform/resolvers/yup";
-import { bookSchema } from "../utils/validation";
+import React, { useState } from "react";
 
-export default function BookForm({ initialValues, onSubmit }) {
-  const { register, handleSubmit, formState: { errors } } = useForm({
-    defaultValues: initialValues,
-    resolver: yupResolver(bookSchema)
+export default function BookForm({ onSubmit }) {
+  const [formData, setFormData] = useState({
+    title: "",
+    author: "",
+    price: "",
   });
+  const [errors, setErrors] = useState({});
+
+  const validate = () => {
+    const newErrors = {};
+    if (!formData.title.trim()) newErrors.title = "Title is required";
+    if (!formData.author.trim()) newErrors.author = "Author is required";
+    if (!formData.price) newErrors.price = "Price is required";
+    return newErrors;
+  };
+
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  const handleSubmit = (e) => {
+    e.preventDefault();
+    const validationErrors = validate();
+    if (Object.keys(validationErrors).length > 0) {
+      setErrors(validationErrors);
+      return;
+    }
+    setErrors({});
+    if (onSubmit) onSubmit(formData);
+  };
 
   return (
-    <form onSubmit={handleSubmit(onSubmit)}>
+    <form onSubmit={handleSubmit}>
       <div>
-        <label>Title</label>
-        <input {...register("title")} />
-        {errors.title && <span>{errors.title.message}</span>}
+        <label htmlFor="title">Title</label>
+        <input
+          id="title"
+          name="title"
+          value={formData.title}
+          onChange={handleChange}
+        />
+        {errors.title && <p>{errors.title}</p>}
       </div>
+
       <div>
-        <label>Author</label>
-        <input {...register("author")} />
-        {errors.author && <span>{errors.author.message}</span>}
+        <label htmlFor="author">Author</label>
+        <input
+          id="author"
+          name="author"
+          value={formData.author}
+          onChange={handleChange}
+        />
+        {errors.author && <p>{errors.author}</p>}
       </div>
+
       <div>
-        <label>Price</label>
-        <input type="number" {...register("price")} />
-        {errors.price && <span>{errors.price.message}</span>}
+        <label htmlFor="price">Price</label>
+        <input
+          id="price"
+          name="price"
+          type="number"
+          value={formData.price}
+          onChange={handleChange}
+        />
+        {errors.price && <p>{errors.price}</p>}
       </div>
-      <button type="submit">Save</button>
+
+      <button type="submit">Submit</button>
     </form>
   );
 }
