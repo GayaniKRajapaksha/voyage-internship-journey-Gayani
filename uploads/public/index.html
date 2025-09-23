@@ -1,0 +1,210 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Professional Node.js System</title>
+<style>
+  body { font-family: Arial, sans-serif; margin: 40px; background: #f0f2f5; }
+  h1 { text-align: center; color: #333; }
+  .tabs { display: flex; justify-content: center; margin-bottom: 20px; }
+  .tab { padding: 10px 20px; margin: 0 5px; cursor: pointer; background: #007BFF; color: #fff; border-radius: 5px; }
+  .tab.active { background: #0056b3; }
+  .section { display: none; background: #fff; padding: 20px; border-radius: 8px; box-shadow: 0 2px 5px rgba(0,0,0,0.1); max-width: 500px; margin: 0 auto 20px; }
+  .section.active { display: block; }
+  input, button { padding: 10px; margin: 5px 0; width: 100%; border-radius: 5px; border: 1px solid #ccc; }
+  button { background: #007BFF; color: #fff; border: none; cursor: pointer; }
+  button:hover { background: #0056b3; }
+  pre { background: #eee; padding: 10px; border-radius: 5px; overflow-x: auto; }
+  .notification { background: #d4edda; color: #155724; padding: 10px; border-radius: 5px; margin-top: 10px; display: none; }
+  .progress-container { background: #eee; border-radius: 5px; margin: 5px 0; height: 20px; }
+  .progress-bar { height: 100%; width: 0%; background: #28a745; border-radius: 5px; transition: width 0.2s; }
+  .spinner { display: none; border: 4px solid #f3f3f3; border-top: 4px solid #007BFF; border-radius: 50%; width: 30px; height: 30px; animation: spin 1s linear infinite; margin: 10px auto; }
+  @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+</style>
+</head>
+<body>
+
+<h1>Professional Node.js System UI</h1>
+
+<div class="tabs">
+  <div class="tab active" data-tab="upload">File Upload</div>
+  <div class="tab" data-tab="email">Send Email</div>
+  <div class="tab" data-tab="export">Export Data</div>
+</div>
+
+<!-- File Upload
+<div class="section active" id="upload">
+  <form id="uploadForm">
+    <input type="file" name="file" id="fileInput" required>
+    <button type="submit">Upload File</button>
+  </form>
+  <div class="spinner" id="uploadSpinner"></div>
+  <div class="progress-container"><div class="progress-bar" id="uploadProgress"></div></div>
+  <pre id="uploadResult"></pre>
+  <div class="notification" id="uploadNotification"></div>
+</div> -->
+
+<!-- File Upload -->
+<div class="section active" id="upload">
+  <form id="uploadForm">
+    <input type="file" name="file" id="fileInput" required>
+    <button type="submit">Upload File</button>
+  </form>
+  <div class="spinner" id="uploadSpinner"></div>
+  <div class="progress-container"><div class="progress-bar" id="uploadProgress"></div></div>
+  <div id="uploadResult" style="margin-top:10px;"></div>
+  <div class="notification" id="uploadNotification"></div>
+</div>
+
+
+<!-- Send Email -->
+<div class="section" id="email">
+  <form id="emailForm">
+    <input type="email" name="to" placeholder="Recipient Email" required>
+    <input type="text" name="subject" placeholder="Subject" required>
+    <input type="text" name="text" placeholder="Message" required>
+    <button type="submit">Send Email</button>
+  </form>
+  <div class="spinner" id="emailSpinner"></div>
+  <pre id="emailResult"></pre>
+  <div class="notification" id="emailNotification"></div>
+</div>
+
+<!-- Export Data -->
+<div class="section" id="export">
+  <button id="exportBtn">Download CSV</button>
+  <div class="spinner" id="exportSpinner"></div>
+  <pre id="exportResult"></pre>
+  <div class="notification" id="exportNotification"></div>
+</div>
+
+<script>
+//   // Tab functionality
+//   const tabs = document.querySelectorAll('.tab');
+//   const sections = document.querySelectorAll('.section');
+//   tabs.forEach(tab => {
+//     tab.addEventListener('click', () => {
+//       tabs.forEach(t => t.classList.remove('active'));
+//       sections.forEach(s => s.classList.remove('active'));
+//       tab.classList.add('active');
+//       document.getElementById(tab.dataset.tab).classList.add('active');
+//     });
+//   });
+
+  // Tab functionality
+  const tabs = document.querySelectorAll('.tab');
+  const sections = document.querySelectorAll('.section');
+  tabs.forEach(tab => {
+    tab.addEventListener('click', () => {
+      tabs.forEach(t => t.classList.remove('active'));
+      sections.forEach(s => s.classList.remove('active'));
+      tab.classList.add('active');
+      document.getElementById(tab.dataset.tab).classList.add('active');
+    });
+  });
+
+  // File Upload
+  const uploadForm = document.getElementById('uploadForm');
+  const uploadResult = document.getElementById('uploadResult');
+  const uploadNotification = document.getElementById('uploadNotification');
+  const uploadProgress = document.getElementById('uploadProgress');
+  const uploadSpinner = document.getElementById('uploadSpinner');
+
+  uploadForm.addEventListener('submit', e => {
+    e.preventDefault();
+    const fileInput = document.getElementById('fileInput');
+    const formData = new FormData();
+    formData.append('file', fileInput.files[0]);
+
+    const xhr = new XMLHttpRequest();
+    xhr.open('POST', '/api/files/upload', true);
+
+    xhr.upload.onprogress = e => {
+      if (e.lengthComputable) {
+        const percent = (e.loaded / e.total) * 100;
+        uploadProgress.style.width = percent + '%';
+      }
+    };
+
+    xhr.onloadstart = () => {
+      uploadSpinner.style.display = 'block';
+      uploadProgress.style.width = '0%';
+    };
+
+    xhr.onloadend = () => {
+      uploadSpinner.style.display = 'none';
+    };
+
+    xhr.onload = () => {
+      const { message, file } = JSON.parse(xhr.responseText);
+      uploadResult.innerHTML = `<b>${message}</b><br>Original: ${file.originalname}<br>Saved as: ${file.filename}`;
+      uploadNotification.textContent = "File uploaded successfully!";
+      uploadNotification.style.display = 'block';
+      setTimeout(() => uploadNotification.style.display = 'none', 3000);
+    };
+
+    xhr.send(formData);
+  });
+
+  // Send Email
+  const emailForm = document.getElementById('emailForm');
+  const emailResult = document.getElementById('emailResult');
+  const emailNotification = document.getElementById('emailNotification');
+  const emailSpinner = document.getElementById('emailSpinner');
+
+  emailForm.addEventListener('submit', async e => {
+    e.preventDefault();
+    emailSpinner.style.display = 'block';
+    const formData = new FormData(emailForm);
+    const body = Object.fromEntries(formData.entries());
+
+    try {
+      const res = await fetch('/api/email/send-email', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body)
+      });
+      const data = await res.text();
+      emailResult.textContent = data;
+      emailNotification.textContent = "Email sent successfully!";
+      emailNotification.style.display = 'block';
+      setTimeout(() => emailNotification.style.display = 'none', 3000);
+    } catch (err) {
+      emailResult.textContent = err;
+    } finally {
+      emailSpinner.style.display = 'none';
+    }
+  });
+
+  // Export Data
+  const exportBtn = document.getElementById('exportBtn');
+  const exportResult = document.getElementById('exportResult');
+  const exportNotification = document.getElementById('exportNotification');
+  const exportSpinner = document.getElementById('exportSpinner');
+
+  exportBtn.addEventListener('click', async () => {
+    exportSpinner.style.display = 'block';
+    try {
+      const res = await fetch('/api/export/export');
+      const blob = await res.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = 'data.csv';
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      exportResult.textContent = '';
+      exportNotification.textContent = "CSV downloaded successfully!";
+      exportNotification.style.display = 'block';
+      setTimeout(() => exportNotification.style.display = 'none', 3000);
+    } catch (err) {
+      exportResult.textContent = 'Error: ' + err.message;
+    } finally {
+      exportSpinner.style.display = 'none';
+    }
+  });
+</script>
+
+</body>
+</html>
