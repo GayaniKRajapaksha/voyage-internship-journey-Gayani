@@ -1,0 +1,28 @@
+
+
+services:
+  backend:
+    build: ./backend
+    container_name: voyage_backend
+    ports:
+      - "4000:4000"
+    env_file:
+      - ./backend/.env
+    networks:
+      - voyage-network
+
+  frontend:
+    build: ./frontend
+    container_name: voyage_frontend
+    ports:
+      - "3000:80"
+    env_file:
+      - ./frontend/.env
+    depends_on:
+      - backend
+    networks:
+      - voyage-network
+
+networks:
+  voyage-network:
+    driver: bridge
